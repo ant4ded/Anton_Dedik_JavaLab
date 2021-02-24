@@ -1,0 +1,19 @@
+plugins {
+    id 'application'
+}
+
+version = '1.0'
+mainClassName = "by.epam.build.api.App"
+
+dependencies {
+    implementation project(":core")
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": mainClassName
+    }
+    from {
+        configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
