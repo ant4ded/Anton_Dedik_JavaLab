@@ -1,0 +1,5 @@
+rootProject.name = 'gift_certificates_system'
+
+include 'data_access'
+include 'core'
+
