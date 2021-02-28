@@ -8,7 +8,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -27,11 +26,10 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
             "id, " +
             "name" +
             ") VALUES (:id,:name)";
-    private static final String QUERY_DELETE_GIFT_TAG_BY_ID = "DELETE FROM public.tag " +
+    private static final String QUERY_DELETE = "DELETE FROM public.gift_certificate_tag " +
+            "WHERE id_tag = :id; " +
+            "DELETE FROM public.tag " +
             "WHERE id = :id";
-    private static final String QUERY_DELETE_GIFT_CERTIFICATE_TAG_BY_GIFT_TAG_ID =
-            "DELETE FROM public.gift_certificate_tag " +
-                    "WHERE id_tag = :id";
 
     private final ResultSetExtractor<GiftTag> tagExtractor;
     private final NamedParameterJdbcTemplate jdbcTemplate;
@@ -60,8 +58,6 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
     @Transactional
     @Override
     public boolean deleteById(long id) {
-        SqlParameterSource source = new MapSqlParameterSource().addValue("id", id);
-        return jdbcTemplate.update(QUERY_DELETE_GIFT_CERTIFICATE_TAG_BY_GIFT_TAG_ID, source) > 0 &&
-                jdbcTemplate.update(QUERY_DELETE_GIFT_TAG_BY_ID, source) > 0;
+        return jdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
     }
 }
