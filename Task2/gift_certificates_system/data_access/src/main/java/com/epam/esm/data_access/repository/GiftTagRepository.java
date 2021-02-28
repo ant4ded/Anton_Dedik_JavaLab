@@ -7,5 +7,5 @@ public interface GiftTagRepository {
 
     boolean save(GiftTag giftTag);
 
-    boolean deleteById(GiftTag giftTag, long id);
+    boolean deleteById(long id);
 }
