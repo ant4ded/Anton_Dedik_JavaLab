@@ -34,7 +34,7 @@ class GiftTagRepositoryImplTest {
 
     @Test
     void save_correctEntity_true(@Autowired GiftTag giftTag) {
-        Assertions.assertTrue(repository.save(giftTag));
+        Assertions.assertTrue(repository.save(giftTag) > 0);
     }
 
     @Test

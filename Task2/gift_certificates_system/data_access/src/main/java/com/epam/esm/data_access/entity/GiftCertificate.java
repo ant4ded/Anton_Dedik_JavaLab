@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class GiftCertificate {
     private LocalDateTime lastUpdateDate;
 
     @Setter(AccessLevel.NONE)
-    private List<GiftTag> tagList;
+    private List<GiftTag> tagList = new LinkedList<>();
 
     public void addTag(GiftTag giftTag){
         tagList.add(giftTag);

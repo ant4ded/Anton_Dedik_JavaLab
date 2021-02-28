@@ -1,6 +1,8 @@
+SET MODE PostgreSQL;
+
 CREATE TABLE public.gift_certificate
 (
-    id               bigint                   NOT NULL,
+    id               bigserial                NOT NULL,
     name             character varying(60)    NOT NULL,
     description      character varying(120),
     price            double precision         NOT NULL,
@@ -9,19 +11,17 @@ CREATE TABLE public.gift_certificate
     last_update_date timestamp with time zone NOT NULL
 );
 
+CREATE TABLE public.tag
+(
+    id   bigserial             NOT NULL,
+    name character varying(60) NOT NULL
+);
 
 CREATE TABLE public.gift_certificate_tag
 (
     id_gift_certificate bigint NOT NULL,
     id_tag              bigint NOT NULL
 );
-
-CREATE TABLE public.tag
-(
-    id   bigint                NOT NULL,
-    name character varying(60) NOT NULL
-);
-
 
 ALTER TABLE public.gift_certificate
     ADD CONSTRAINT gift_certificate_pkey PRIMARY KEY (id);
