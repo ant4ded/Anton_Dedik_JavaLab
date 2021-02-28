@@ -33,7 +33,7 @@ public class EntityProviderConfiguration {
     protected GiftTag giftTag() {
         GiftTag giftTag = new GiftTag();
         giftTag.setId(prototypeCount);
-        giftTag.setName(prototypeCount + "certificate");
+        giftTag.setName(prototypeCount + "tag");
         prototypeCount++;
         return giftTag;
     }
