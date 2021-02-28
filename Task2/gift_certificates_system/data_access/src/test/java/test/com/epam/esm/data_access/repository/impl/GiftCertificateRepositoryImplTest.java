@@ -17,8 +17,9 @@ class GiftCertificateRepositoryImplTest {
     private GiftCertificateRepository repository;
 
     @Test
-    void findById_existentId_notNull() {
-        Assertions.assertNotNull(repository.findById(1));
+    void findById_existentId_giftCertificateWithAllTags() {
+        GiftCertificate giftCertificate = repository.findById(3);
+        Assertions.assertTrue(giftCertificate != null && giftCertificate.getTagList().size() == 3);
     }
 
     @Test
@@ -33,14 +34,7 @@ class GiftCertificateRepositoryImplTest {
 
     @Test
     void save_correctEntity_true(@Autowired GiftCertificate giftCertificate) {
-        Assertions.assertTrue(repository.save(giftCertificate));
-    }
-
-    @Test
-    void save_existentId_exception(@Autowired GiftCertificate giftCertificate) {
-        giftCertificate.setId(1);
-        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftCertificate));
-        Assertions.assertTrue(exception.getMessage().contains("primary key"));
+        Assertions.assertTrue(repository.save(giftCertificate) > 0);
     }
 
     @Test
@@ -61,11 +55,10 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
-    void updateById_emptyEntity_exception() {
+    void updateById_emptyEntity_true() {
         GiftCertificate giftCertificate = new GiftCertificate();
-        giftCertificate.setId(1);
-        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.updateById(giftCertificate));
-        Assertions.assertTrue(exception.getMessage().contains("NULL"));
+        giftCertificate.setId(2);
+        Assertions.assertTrue(repository.updateById(giftCertificate));
     }
 
     @Test
