@@ -38,13 +38,6 @@ class GiftTagRepositoryImplTest {
     }
 
     @Test
-    void save_existentId_exception(@Autowired GiftTag giftTag) {
-        giftTag.setId(1);
-        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftTag));
-        Assertions.assertTrue(exception.getMessage().contains("primary key"));
-    }
-
-    @Test
     void save_emptyEntity_exception() {
         Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(new GiftTag()));
         Assertions.assertTrue(exception.getMessage().contains("NULL"));

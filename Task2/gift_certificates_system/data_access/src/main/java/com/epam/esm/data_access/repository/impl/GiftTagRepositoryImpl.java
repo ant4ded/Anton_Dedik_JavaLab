@@ -23,9 +23,8 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
             "FROM public.tag AS t " +
             "WHERE t.id = :id";
     private static final String QUERY_SAVE = "INSERT INTO public.tag (" +
-            "id, " +
             "name" +
-            ") VALUES (:id,:name)";
+            ") VALUES (:id)";
     private static final String QUERY_DELETE = "DELETE FROM public.gift_certificate_tag " +
             "WHERE id_tag = :id; " +
             "DELETE FROM public.tag " +
