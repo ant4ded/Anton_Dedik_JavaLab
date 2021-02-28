@@ -34,7 +34,7 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
-    public GiftTagRepositoryImpl(DataSource dataSource, @Qualifier("giftTagResultSetExtractor") ResultSetExtractor<GiftTag> tagExtractor) {
+    public GiftTagRepositoryImpl(DataSource dataSource, ResultSetExtractor<GiftTag> tagExtractor) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.tagExtractor = tagExtractor;
     }

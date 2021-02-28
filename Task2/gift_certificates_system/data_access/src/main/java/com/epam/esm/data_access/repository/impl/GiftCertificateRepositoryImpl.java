@@ -59,8 +59,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     @Autowired
     public GiftCertificateRepositoryImpl(DataSource dataSource,
-                                         @Qualifier("giftCertificateResultSetExtractor")
-                                                 ResultSetExtractor<GiftCertificate> certificateExtractor) {
+                                         ResultSetExtractor<GiftCertificate> certificateExtractor) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.certificateExtractor = certificateExtractor;
     }
