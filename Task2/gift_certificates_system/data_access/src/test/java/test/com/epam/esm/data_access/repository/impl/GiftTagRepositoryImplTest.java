@@ -38,21 +38,22 @@ class GiftTagRepositoryImplTest {
     }
 
     @Test
-    void save_existentId_exception(@Autowired GiftTag giftTag) {
-        giftTag.setId(1);
-        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftTag));
-        Assertions.assertTrue(exception.getMessage().contains("primary key"));
-    }
-
-    @Test
     void save_emptyEntity_exception() {
         Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(new GiftTag()));
         Assertions.assertTrue(exception.getMessage().contains("NULL"));
     }
 
     @Test
+    void save_existentName_exception() {
+        GiftTag giftTag = new GiftTag();
+        giftTag.setName("1tag");
+        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftTag));
+        Assertions.assertTrue(exception.getMessage().contains("Unique"));
+    }
+
+    @Test
     void deleteById_existentEntity_true() {
-        Assertions.assertTrue(repository.deleteById(1));
+        Assertions.assertTrue(repository.deleteById(2));
     }
 
     @Test

@@ -43,4 +43,4 @@ ALTER TABLE public.gift_certificate_tag
 
 ALTER TABLE public.gift_certificate_tag
     ADD CONSTRAINT "fk_GiftCertificateTag_idTag_Tag_id"
-        FOREIGN KEY (id_gift_certificate) REFERENCES public.tag (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        FOREIGN KEY (id_tag) REFERENCES public.tag (id) ON UPDATE CASCADE ON DELETE RESTRICT;

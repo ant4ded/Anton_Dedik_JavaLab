@@ -3,12 +3,10 @@ package com.epam.esm.data_access.repository.impl;
 import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -49,19 +47,18 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "duration = CASE WHEN :duration = 0 THEN duration ELSE :duration END, " +
             "last_update_date = COALESCE(:lastUpdateDate, last_update_date)" +
             "WHERE id = :id";
-    private static final String QUERY_DELETE_GIFT_CERTIFICATE_BY_ID = "DELETE FROM public.gift_certificate " +
+    private static final String QUERY_DELETE = "DELETE FROM public.gift_certificate_tag " +
+            "WHERE id_gift_certificate = :id; " +
+            "DELETE FROM public.gift_certificate " +
             "WHERE id = :id";
-    private static final String QUERY_DELETE_GIFT_CERTIFICATE_TAG_BY_GIFT_CERTIFICATE_ID =
-            "DELETE FROM public.gift_certificate_tag " +
-                    "WHERE id_gift_certificate = :id";
+
 
     private final ResultSetExtractor<GiftCertificate> certificateExtractor;
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     @Autowired
     public GiftCertificateRepositoryImpl(DataSource dataSource,
-                                         @Qualifier("giftCertificateResultSetExtractor")
-                                                 ResultSetExtractor<GiftCertificate> certificateExtractor) {
+                                         ResultSetExtractor<GiftCertificate> certificateExtractor) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.certificateExtractor = certificateExtractor;
     }
@@ -89,8 +86,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Transactional
     @Override
     public boolean deleteById(long id) {
-        SqlParameterSource source = new MapSqlParameterSource().addValue("id", id);
-        return jdbcTemplate.update(QUERY_DELETE_GIFT_CERTIFICATE_TAG_BY_GIFT_CERTIFICATE_ID, source) > 0 &&
-                jdbcTemplate.update(QUERY_DELETE_GIFT_CERTIFICATE_BY_ID, source) > 0;
+        return jdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
     }
 }
