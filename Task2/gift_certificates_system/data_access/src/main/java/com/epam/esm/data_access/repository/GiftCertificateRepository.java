@@ -7,7 +7,7 @@ public interface GiftCertificateRepository {
 
     boolean save(GiftCertificate giftCertificate);
 
-    boolean updateById(GiftCertificate giftCertificate, long id);
+    boolean updateById(GiftCertificate giftCertificate);
 
-    boolean deleteById(GiftCertificate giftCertificate, long id);
+    boolean deleteById(long id);
 }
