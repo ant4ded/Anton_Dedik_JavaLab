@@ -3,7 +3,6 @@ package com.epam.esm.data_access.repository.impl;
 import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
