@@ -31,13 +31,15 @@ public class DataAccessConfiguration {
     }
 
     @Bean
-    protected ResultSetExtractor<GiftCertificate> giftCertificateRowMapper() {
+    protected ResultSetExtractor<GiftCertificate> giftCertificateResultSetExtractor() {
         return rs -> {
             int rowNum = 0;
             if (rs.next()) {
                 GiftCertificate certificate = giftCertificateRowMapper.mapRow(rs, rowNum);
-                while (rs.next() && certificate != null) {
-                    certificate.addTag(tagRowMapper.mapRow(rs, rowNum++));
+                if (certificate != null) {
+                    do {
+                        certificate.addTag(tagRowMapper.mapRow(rs, rowNum));
+                    } while (rs.next());
                 }
                 return certificate;
             }
@@ -46,7 +48,7 @@ public class DataAccessConfiguration {
     }
 
     @Bean
-    protected ResultSetExtractor<GiftTag> giftTagRowMapper() {
+    protected ResultSetExtractor<GiftTag> giftTagResultSetExtractor() {
         return rs -> {
             if (rs.next()) {
                 return tagRowMapper.mapRow(rs, 0);
