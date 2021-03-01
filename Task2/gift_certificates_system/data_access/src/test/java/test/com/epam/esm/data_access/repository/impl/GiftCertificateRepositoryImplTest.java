@@ -50,6 +50,13 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
+    void save_existentName_exception(@Autowired GiftCertificate giftCertificate) {
+        giftCertificate.setName("3certificate");
+        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftCertificate));
+        Assertions.assertTrue(exception.getMessage().contains("Unique"));
+    }
+
+    @Test
     void save_withExistentTag_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftTag.setName("1tag");
         giftCertificate.addTag(giftTag);
@@ -59,7 +66,7 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void save_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftCertificate.addTag(giftTag);
-        for (GiftTag tag:giftCertificate.getTagList()){
+        for (GiftTag tag : giftCertificate.getTagList()) {
             tag.setName("1tag");
         }
         Assertions.assertTrue(repository.save(giftCertificate) > 0);
@@ -92,7 +99,7 @@ class GiftCertificateRepositoryImplTest {
     void updateByName_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftCertificate.setName("3certificate");
         giftCertificate.addTag(giftTag);
-        for (GiftTag tag:giftCertificate.getTagList()){
+        for (GiftTag tag : giftCertificate.getTagList()) {
             tag.setName("1tag");
         }
         Assertions.assertTrue(repository.updateByName(giftCertificate));

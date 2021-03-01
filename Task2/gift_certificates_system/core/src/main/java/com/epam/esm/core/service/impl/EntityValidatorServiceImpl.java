@@ -12,7 +12,7 @@ public class EntityValidatorServiceImpl implements EntityValidatorService {
         boolean isValidName = giftCertificate.getName() != null && !giftCertificate.getName().equals("");
         boolean isValidPrice = giftCertificate.getPrice() > 0;
         boolean isValidDuration = giftCertificate.getDuration() > 0;
-        if (!isValidName || isValidPrice || !isValidDuration) {
+        if (!isValidName || !isValidPrice || !isValidDuration || giftCertificate.getTagList().isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder("Invalid entity fields ");
             stringBuilder.append("of ").append(GiftCertificate.class.getSimpleName()).append(':')
                     .append(!isValidName ? " name" : "")

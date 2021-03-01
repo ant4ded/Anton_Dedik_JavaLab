@@ -27,13 +27,19 @@ public class GiftTagServiceImpl implements GiftTagService {
     }
 
     @Override
-    public long save(GiftTag giftTag) throws InvalidEntityFieldException {
+    public boolean save(GiftTag giftTag) throws InvalidEntityFieldException {
+        if (giftTag == null) {
+            return false;
+        }
         validatorService.validateTag(giftTag);
-        return repository.save(giftTag);
+        return repository.save(giftTag) > 0;
     }
 
     @Override
     public boolean delete(GiftTag giftTag) {
+        if (giftTag == null) {
+            return false;
+        }
         return repository.deleteById(findByName(giftTag.getName()).orElse(new GiftTag()).getId());
     }
 }
