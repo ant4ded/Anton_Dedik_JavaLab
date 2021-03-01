@@ -41,7 +41,7 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void findByName_entityNotExist_present() {
+    void findByName_entityExist_present() {
         Mockito.when(repository.findByName(Mockito.anyString()))
                 .thenReturn(new GiftCertificate());
         Assertions.assertTrue(service.findByName(Mockito.anyString()).isPresent());
