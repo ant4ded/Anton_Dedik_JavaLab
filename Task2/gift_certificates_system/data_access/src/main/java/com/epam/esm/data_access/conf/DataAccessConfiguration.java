@@ -2,13 +2,14 @@ package com.epam.esm.data_access.conf;
 
 import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.entity.GiftTag;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import javax.sql.DataSource;
 
@@ -22,12 +23,7 @@ public class DataAccessConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName("org.postgresql.Driver");
-        dataSource.setUrl("jdbc:postgresql://localhost:5432/gift_certificates");
-        dataSource.setUsername("postgresql");
-        dataSource.setPassword("root");
-        return dataSource;
+        return new HikariDataSource(new HikariConfig("classpath:db.properties"));
     }
 
     @Bean
