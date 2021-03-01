@@ -46,6 +46,4 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public boolean delete(GiftCertificate giftCertificate) {
         return repository.deleteById(findByName(giftCertificate.getName()).orElse(new GiftCertificate()).getId());
     }
-
-
 }
