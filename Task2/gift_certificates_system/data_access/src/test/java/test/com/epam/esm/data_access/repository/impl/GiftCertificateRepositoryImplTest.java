@@ -1,6 +1,7 @@
 package test.com.epam.esm.data_access.repository.impl;
 
 import com.epam.esm.data_access.entity.GiftCertificate;
+import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,34 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
+    void findByName_existentName_giftCertificateWithAllTags() {
+        GiftCertificate giftCertificate = repository.findByName("3certificate");
+        Assertions.assertTrue(giftCertificate != null && giftCertificate.getTagList().size() == 3);
+    }
+
+    @Test
+    void findByName_nonExistentName_null() {
+        Assertions.assertNull(repository.findByName("999"));
+    }
+
+    @Test
     void save_correctEntity_true(@Autowired GiftCertificate giftCertificate) {
+        Assertions.assertTrue(repository.save(giftCertificate) > 0);
+    }
+
+    @Test
+    void save_withExistentTag_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
+        giftTag.setName("1tag");
+        giftCertificate.addTag(giftTag);
+        Assertions.assertTrue(repository.save(giftCertificate) > 0);
+    }
+
+    @Test
+    void save_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
+        giftCertificate.addTag(giftTag);
+        for (GiftTag tag:giftCertificate.getTagList()){
+            tag.setName("1tag");
+        }
         Assertions.assertTrue(repository.save(giftCertificate) > 0);
     }
 
@@ -44,21 +72,30 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
-    void updateById_existentEntity_true(@Autowired GiftCertificate giftCertificate) {
-        giftCertificate.setId(1);
-        Assertions.assertTrue(repository.updateById(giftCertificate));
+    void updateByName_existentEntity_true(@Autowired GiftCertificate giftCertificate) {
+        giftCertificate.setName("3certificate");
+        Assertions.assertTrue(repository.updateByName(giftCertificate));
     }
 
     @Test
-    void updateById_nonExistentId_false(@Autowired GiftCertificate giftCertificate) {
-        Assertions.assertFalse(repository.updateById(giftCertificate));
+    void updateByName_nonExistentName_false(@Autowired GiftCertificate giftCertificate) {
+        Assertions.assertFalse(repository.updateByName(giftCertificate));
     }
 
     @Test
-    void updateById_emptyEntity_true() {
+    void updateByName_emptyEntity_false() {
         GiftCertificate giftCertificate = new GiftCertificate();
-        giftCertificate.setId(2);
-        Assertions.assertTrue(repository.updateById(giftCertificate));
+        Assertions.assertFalse(repository.updateByName(giftCertificate));
+    }
+
+    @Test
+    void updateByName_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
+        giftCertificate.setName("3certificate");
+        giftCertificate.addTag(giftTag);
+        for (GiftTag tag:giftCertificate.getTagList()){
+            tag.setName("1tag");
+        }
+        Assertions.assertTrue(repository.updateByName(giftCertificate));
     }
 
     @Test

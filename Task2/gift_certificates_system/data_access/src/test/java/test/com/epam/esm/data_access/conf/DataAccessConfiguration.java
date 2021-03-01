@@ -65,8 +65,9 @@ public class DataAccessConfiguration {
     @Bean
     @Autowired
     protected GiftCertificateRepository giftCertificateRepository(DataSource dataSource,
-                                                                  ResultSetExtractor<GiftCertificate> resultSetExtractor) {
-        return new GiftCertificateRepositoryImpl(dataSource, resultSetExtractor);
+                                                                  ResultSetExtractor<GiftCertificate> resultSetExtractor,
+                                                                  GiftTagRepository giftTagRepository) {
+        return new GiftCertificateRepositoryImpl(dataSource, resultSetExtractor, giftTagRepository);
     }
 
     @Bean
