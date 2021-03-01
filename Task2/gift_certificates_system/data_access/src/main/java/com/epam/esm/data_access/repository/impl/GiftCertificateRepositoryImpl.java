@@ -1,7 +1,9 @@
 package com.epam.esm.data_access.repository.impl;
 
 import com.epam.esm.data_access.entity.GiftCertificate;
+import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
+import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.HashSet;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
@@ -32,6 +35,22 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "INNER JOIN public.tag AS t " +
             "   ON t.id = gct.id_tag " +
             "WHERE gc.id = :id";
+    private static final String QUERY_FIND_BY_NAME = "SELECT " +
+            "gc.id," +
+            "gc.name," +
+            "gc.description," +
+            "gc.price," +
+            "gc.duration," +
+            "gc.create_date," +
+            "gc.last_update_date, " +
+            "t.id , " +
+            "t.name " +
+            "FROM public.gift_certificate AS gc " +
+            "INNER JOIN public.gift_certificate_tag AS gct " +
+            "   ON gct.id_gift_certificate = gc.id " +
+            "INNER JOIN public.tag AS t " +
+            "   ON t.id = gct.id_tag " +
+            "WHERE gc.name = :name";
     private static final String QUERY_SAVE = "INSERT INTO public.gift_certificate (" +
             "name, " +
             "description, " +
@@ -40,13 +59,17 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "create_date, " +
             "last_update_date" +
             ") VALUES (:name,:description,:price,:duration,:createDate,:lastUpdateDate)";
+    private static final String QUERY_SAVE_FOREIGN_KEY = "INSERT INTO public.gift_certificate_tag(" +
+            "id_gift_certificate, " +
+            "id_tag" +
+            ") VALUES (:id_gift_certificate, :id_tag)";
     private static final String QUERY_UPDATE = "UPDATE public.gift_certificate SET " +
             "name = COALESCE(:name, name), " +
             "description = COALESCE(:description, description), " +
             "price = CASE WHEN :price = 0 THEN price ELSE :price END, " +
             "duration = CASE WHEN :duration = 0 THEN duration ELSE :duration END, " +
             "last_update_date = COALESCE(:lastUpdateDate, last_update_date)" +
-            "WHERE id = :id";
+            "WHERE name = :name";
     private static final String QUERY_DELETE = "DELETE FROM public.gift_certificate_tag " +
             "WHERE id_gift_certificate = :id; " +
             "DELETE FROM public.gift_certificate " +
@@ -55,12 +78,15 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
 
     private final ResultSetExtractor<GiftCertificate> certificateExtractor;
     private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final GiftTagRepository tagRepository;
 
     @Autowired
     public GiftCertificateRepositoryImpl(DataSource dataSource,
-                                         ResultSetExtractor<GiftCertificate> certificateExtractor) {
+                                         ResultSetExtractor<GiftCertificate> certificateExtractor,
+                                         GiftTagRepository tagRepository) {
         this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.certificateExtractor = certificateExtractor;
+        this.tagRepository = tagRepository;
     }
 
     @Override
@@ -70,16 +96,41 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 certificateExtractor);
     }
 
+    @Override
+    public GiftCertificate findByName(String name) {
+        return jdbcTemplate.query(QUERY_FIND_BY_NAME,
+                new MapSqlParameterSource().addValue("name", name),
+                certificateExtractor);
+    }
+
     @SuppressWarnings("ConstantConditions")
+    @Transactional
     @Override
     public long save(GiftCertificate giftCertificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftCertificate), keyHolder);
-        return keyHolder.getKeyAs(Long.class);
+        giftCertificate.setId(keyHolder.getKeyAs(Long.class));
+        for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
+            saveNonExistTag(giftTag);
+            jdbcTemplate.update(QUERY_SAVE_FOREIGN_KEY, new MapSqlParameterSource()
+                    .addValue("id_gift_certificate", giftCertificate.getId())
+                    .addValue("id_tag", giftTag.getId()));
+        }
+        return giftCertificate.getId();
     }
 
+    @Transactional
     @Override
-    public boolean updateById(GiftCertificate giftCertificate) {
+    public boolean updateByName(GiftCertificate giftCertificate) {
+        GiftCertificate certificateFromDb = findByName(giftCertificate.getName());
+        if (certificateFromDb == null) {
+            return false;
+        } else {
+            giftCertificate.setId(certificateFromDb.getId());
+        }
+        for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
+            saveNonExistTag(giftTag);
+        }
         return jdbcTemplate.update(QUERY_UPDATE, new BeanPropertySqlParameterSource(giftCertificate)) > 0;
     }
 
@@ -87,5 +138,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public boolean deleteById(long id) {
         return jdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
+    }
+
+    private void saveNonExistTag(GiftTag giftTag) {
+        GiftTag giftTagFromDb = tagRepository.findByName(giftTag.getName());
+        if (giftTagFromDb == null) {
+            giftTag.setId(tagRepository.save(giftTag));
+        } else {
+            giftTag.setId(giftTagFromDb.getId());
+        }
     }
 }

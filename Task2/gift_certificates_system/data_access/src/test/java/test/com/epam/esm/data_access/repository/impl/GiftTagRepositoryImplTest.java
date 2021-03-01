@@ -33,6 +33,16 @@ class GiftTagRepositoryImplTest {
     }
 
     @Test
+    void findByName_existentName_notNull() {
+        Assertions.assertNotNull(repository.findByName("1tag"));
+    }
+
+    @Test
+    void findByName_nonExistentName_null() {
+        Assertions.assertNull(repository.findByName("999"));
+    }
+
+    @Test
     void save_correctEntity_true(@Autowired GiftTag giftTag) {
         Assertions.assertTrue(repository.save(giftTag) > 0);
     }

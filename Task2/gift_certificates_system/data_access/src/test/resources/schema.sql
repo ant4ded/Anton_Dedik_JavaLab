@@ -36,6 +36,9 @@ ALTER TABLE public.tag
 ALTER TABLE public.tag
     ADD CONSTRAINT unique_tag_name UNIQUE (name);
 
+ALTER TABLE public.gift_certificate
+    ADD CONSTRAINT unique_gift_certificate_name UNIQUE (name);
+
 ALTER TABLE public.gift_certificate_tag
     ADD CONSTRAINT "fk_GiftCertificateTag_idGiftCertificate_GiftCertificate_id"
         FOREIGN KEY (id_gift_certificate) REFERENCES public.gift_certificate (id) ON UPDATE CASCADE ON DELETE RESTRICT;

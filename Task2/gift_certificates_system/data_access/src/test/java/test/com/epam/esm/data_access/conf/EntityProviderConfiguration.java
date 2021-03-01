@@ -2,6 +2,7 @@ package test.com.epam.esm.data_access.conf;
 
 import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.entity.GiftTag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,7 +16,7 @@ public class EntityProviderConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    protected GiftCertificate giftCertificate() {
+    protected GiftCertificate giftCertificate(@Autowired GiftTag giftTag) {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setId(prototypeCount);
         giftCertificate.setName(prototypeCount + "certificate");
@@ -24,6 +25,7 @@ public class EntityProviderConfiguration {
         giftCertificate.setDuration(prototypeCount);
         giftCertificate.setCreateDate(LocalDateTime.now());
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
+        giftCertificate.addTag(giftTag);
         prototypeCount++;
         return giftCertificate;
     }

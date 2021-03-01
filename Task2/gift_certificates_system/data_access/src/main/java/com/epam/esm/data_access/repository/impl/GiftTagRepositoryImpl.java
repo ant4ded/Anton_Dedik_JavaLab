@@ -21,6 +21,11 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
             "t.name " +
             "FROM public.tag AS t " +
             "WHERE t.id = :id";
+    private static final String QUERY_FIND_BY_NAME = "SELECT " +
+            "t.id," +
+            "t.name " +
+            "FROM public.tag AS t " +
+            "WHERE t.name = :name";
     private static final String QUERY_SAVE = "INSERT INTO public.tag (" +
             "name" +
             ") VALUES (:name)";
@@ -42,6 +47,13 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
     public GiftTag findById(long id) {
         return jdbcTemplate.query(QUERY_FIND_BY_ID,
                 new MapSqlParameterSource().addValue("id", id),
+                tagExtractor);
+    }
+
+    @Override
+    public GiftTag findByName(String name) {
+        return jdbcTemplate.query(QUERY_FIND_BY_NAME,
+                new MapSqlParameterSource().addValue("name", name),
                 tagExtractor);
     }
 

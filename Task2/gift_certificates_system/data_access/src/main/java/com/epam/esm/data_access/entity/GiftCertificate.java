@@ -2,6 +2,7 @@ package com.epam.esm.data_access.entity;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(exclude = "id")
 public class GiftCertificate {
     private long id;
     private String name;
