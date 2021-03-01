@@ -29,21 +29,29 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
 
     @Override
     public boolean save(GiftCertificate giftCertificate) throws InvalidEntityFieldException {
+        if (giftCertificate == null){
+            return false;
+        }
         validatorService.validateCertificate(giftCertificate);
         giftCertificate.setCreateDate(LocalDateTime.now());
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        repository.save(giftCertificate);
         return repository.save(giftCertificate) > 0;
     }
 
     @Override
     public boolean update(GiftCertificate giftCertificate) {
+        if (giftCertificate == null){
+            return false;
+        }
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
         return repository.updateByName(giftCertificate);
     }
 
     @Override
     public boolean delete(GiftCertificate giftCertificate) {
+        if (giftCertificate == null){
+            return false;
+        }
         return repository.deleteById(findByName(giftCertificate.getName()).orElse(new GiftCertificate()).getId());
     }
 }
