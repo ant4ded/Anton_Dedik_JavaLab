@@ -50,6 +50,13 @@ class GiftCertificateRepositoryImplTest {
     }
 
     @Test
+    void save_existentName_exception(@Autowired GiftCertificate giftCertificate) {
+        giftCertificate.setName("3certificate");
+        Exception exception = Assertions.assertThrows(Exception.class, () -> repository.save(giftCertificate));
+        Assertions.assertTrue(exception.getMessage().contains("Unique"));
+    }
+
+    @Test
     void save_withExistentTag_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftTag.setName("1tag");
         giftCertificate.addTag(giftTag);
