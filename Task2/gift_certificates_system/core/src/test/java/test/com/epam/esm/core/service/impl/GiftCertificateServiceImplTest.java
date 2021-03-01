@@ -77,7 +77,7 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void update_null_false(){
+    void update_null_false() {
         Assertions.assertFalse(service.update(null));
     }
 
@@ -95,7 +95,7 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void delete_null_false(){
+    void delete_null_false() {
         Assertions.assertFalse(service.delete(null));
     }
 

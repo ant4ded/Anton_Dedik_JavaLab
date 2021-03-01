@@ -66,7 +66,7 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void save_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftCertificate.addTag(giftTag);
-        for (GiftTag tag:giftCertificate.getTagList()){
+        for (GiftTag tag : giftCertificate.getTagList()) {
             tag.setName("1tag");
         }
         Assertions.assertTrue(repository.save(giftCertificate) > 0);
@@ -99,7 +99,7 @@ class GiftCertificateRepositoryImplTest {
     void updateByName_withIdentityTags_true(@Autowired GiftCertificate giftCertificate, @Autowired GiftTag giftTag) {
         giftCertificate.setName("3certificate");
         giftCertificate.addTag(giftTag);
-        for (GiftTag tag:giftCertificate.getTagList()){
+        for (GiftTag tag : giftCertificate.getTagList()) {
             tag.setName("1tag");
         }
         Assertions.assertTrue(repository.updateByName(giftCertificate));

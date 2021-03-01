@@ -4,7 +4,6 @@ import com.epam.esm.core.service.EntityValidatorService;
 import com.epam.esm.core.service.GiftTagService;
 import com.epam.esm.core.service.InvalidEntityFieldException;
 import com.epam.esm.core.service.impl.GiftTagServiceImpl;
-import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.junit.jupiter.api.Assertions;
@@ -78,7 +77,7 @@ class GiftTagServiceImplTest {
     }
 
     @Test
-    void delete_null_false(){
+    void delete_null_false() {
         Assertions.assertFalse(service.delete(null));
     }
 
