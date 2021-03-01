@@ -27,9 +27,9 @@ public class GiftTagServiceImpl implements GiftTagService {
     }
 
     @Override
-    public long save(GiftTag giftTag) throws InvalidEntityFieldException {
+    public boolean save(GiftTag giftTag) throws InvalidEntityFieldException {
         validatorService.validateTag(giftTag);
-        return repository.save(giftTag);
+        return repository.save(giftTag) > 0;
     }
 
     @Override

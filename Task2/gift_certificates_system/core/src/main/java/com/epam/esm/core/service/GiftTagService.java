@@ -7,7 +7,7 @@ import java.util.Optional;
 public interface GiftTagService {
     Optional<GiftTag> findByName(String name);
 
-    long save(GiftTag giftTag) throws InvalidEntityFieldException;
+    boolean save(GiftTag giftTag) throws InvalidEntityFieldException;
 
     boolean delete(GiftTag giftTag);
 }
