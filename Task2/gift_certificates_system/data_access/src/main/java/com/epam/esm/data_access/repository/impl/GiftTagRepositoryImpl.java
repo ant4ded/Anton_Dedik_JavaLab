@@ -1,6 +1,7 @@
 package com.epam.esm.data_access.repository.impl;
 
 import com.epam.esm.data_access.entity.GiftTag;
+import com.epam.esm.data_access.entity.table.TagTableColumnName;
 import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -46,14 +47,14 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
     @Override
     public GiftTag findById(long id) {
         return jdbcTemplate.query(QUERY_FIND_BY_ID,
-                new MapSqlParameterSource().addValue("id", id),
+                new MapSqlParameterSource().addValue(TagTableColumnName.COLUMN_ID, id),
                 tagExtractor);
     }
 
     @Override
     public GiftTag findByName(String name) {
         return jdbcTemplate.query(QUERY_FIND_BY_NAME,
-                new MapSqlParameterSource().addValue("name", name),
+                new MapSqlParameterSource().addValue(TagTableColumnName.COLUMN_NAME, name),
                 tagExtractor);
     }
 
@@ -68,6 +69,7 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
     @Transactional
     @Override
     public boolean deleteById(long id) {
-        return jdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
+        return jdbcTemplate.update(QUERY_DELETE,
+                new MapSqlParameterSource().addValue(TagTableColumnName.COLUMN_ID, id)) > 0;
     }
 }
