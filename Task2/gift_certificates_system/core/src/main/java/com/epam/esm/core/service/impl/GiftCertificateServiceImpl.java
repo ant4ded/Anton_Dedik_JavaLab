@@ -59,6 +59,21 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
+    public List<GiftCertificate> findAllByTagName(String name) {
+        return repository.findAllByTagName(name);
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByPartOfCertificateName(String part) {
+        return repository.findAllByPartOfCertificateName(part);
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByPartOfCertificateDescription(String part) {
+        return repository.findAllByPartOfCertificateDescription(part);
+    }
+
+    @Override
     public void sortBy(List<GiftCertificate> list, GiftCertificateSortType sortType) {
         Comparator<GiftCertificate> comparator;
         switch (sortType) {

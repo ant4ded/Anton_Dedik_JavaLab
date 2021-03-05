@@ -14,5 +14,11 @@ public interface GiftCertificateService {
 
     boolean delete(GiftCertificate giftCertificate);
 
+    List<GiftCertificate> findAllByTagName(String name);
+
+    List<GiftCertificate> findAllByPartOfCertificateName(String part);
+
+    List<GiftCertificate> findAllByPartOfCertificateDescription(String part);
+
     void sortBy(List<GiftCertificate> list, GiftCertificateSortType sortType);
 }
