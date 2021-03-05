@@ -17,13 +17,13 @@ import javax.sql.DataSource;
 @Repository
 public class GiftTagRepositoryImpl implements GiftTagRepository {
     private static final String QUERY_FIND_BY_ID = "SELECT " +
-            "t.id," +
-            "t.name " +
+            "t.id   AS tag_id, " +
+            "t.name AS tag_name " +
             "FROM public.tag AS t " +
             "WHERE t.id = :id";
     private static final String QUERY_FIND_BY_NAME = "SELECT " +
-            "t.id," +
-            "t.name " +
+            "t.id   AS tag_id, " +
+            "t.name AS tag_name " +
             "FROM public.tag AS t " +
             "WHERE t.name = :name";
     private static final String QUERY_SAVE = "INSERT INTO public.tag (" +
