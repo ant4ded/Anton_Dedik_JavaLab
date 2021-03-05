@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.com.epam.esm.data_access.conf.DataAccessConfiguration;
@@ -14,6 +15,7 @@ import test.com.epam.esm.data_access.conf.DataAccessConfiguration;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ContextConfiguration(classes = DataAccessConfiguration.class)
 class GiftCertificateRepositoryImplTest {
     @Autowired
@@ -126,5 +128,10 @@ class GiftCertificateRepositoryImplTest {
         firstTagsCount = list.get(0).getTagList().size();
         secondTagsCount = list.get(1).getTagList().size();
         Assertions.assertTrue(firstTagsCount == 2 && secondTagsCount == 3);
+    }
+
+    @Test
+    void findAllByTagName_nonExistentTagName_emptyList() {
+        Assertions.assertTrue(repository.findAllByTagName("999").isEmpty());
     }
 }
