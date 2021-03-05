@@ -1,0 +1,15 @@
+dependencies {
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.18'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.18'
+    implementation group: 'org.springframework', name: 'spring-jdbc', version: project.properties['version.spring']
+    implementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
+
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.7.1'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '5.3.4'
+    testImplementation group: 'com.h2database', name: 'h2', version: '1.4.200'
+    testImplementation group: 'com.zaxxer', name: 'HikariCP', version: '4.0.2'
+
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
+    testRuntimeOnly group: 'org.springframework', name: 'spring-test', version: '5.3.4'
+
+}
