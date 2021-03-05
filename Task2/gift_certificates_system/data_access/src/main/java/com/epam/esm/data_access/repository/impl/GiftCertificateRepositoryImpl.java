@@ -6,7 +6,6 @@ import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -98,7 +96,7 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "INNER JOIN public.gift_certificate_tag AS gct_all " +
             "   ON gct_all.id_gift_certificate = gc.id " +
             "INNER JOIN public.tag AS t_all " +
-            "   ON t_all.id = gct_all.id_tag" ;
+            "   ON t_all.id = gct_all.id_tag";
     private static final String QUERY_FIND_ALL_LIKE_CERTIFICATE_NAME = "SELECT " +
             "gc.id                  AS gift_certificate_id, " +
             "gc.name                AS gift_certificate_name," +

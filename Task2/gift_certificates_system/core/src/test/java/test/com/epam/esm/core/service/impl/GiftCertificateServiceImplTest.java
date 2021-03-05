@@ -2,9 +2,11 @@ package test.com.epam.esm.core.service.impl;
 
 import com.epam.esm.core.service.EntityValidatorService;
 import com.epam.esm.core.service.GiftCertificateService;
+import com.epam.esm.core.service.GiftCertificateSortType;
 import com.epam.esm.core.service.InvalidEntityFieldException;
 import com.epam.esm.core.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.data_access.entity.GiftCertificate;
+import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,9 +16,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.com.epam.esm.core.conf.ServiceConfiguration;
+
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = ServiceConfiguration.class)
@@ -25,6 +33,10 @@ class GiftCertificateServiceImplTest {
     private GiftCertificateRepository repository;
     @Mock
     private EntityValidatorService validator;
+
+    @Autowired
+    @Qualifier("giftCertificateList")
+    private List<GiftCertificate> giftCertificateList;
 
     private GiftCertificateService service;
 
@@ -104,5 +116,187 @@ class GiftCertificateServiceImplTest {
         giftCertificate.setName(null);
         Mockito.when(repository.findByName(null)).thenReturn(null);
         Assertions.assertFalse(service.delete(giftCertificate));
+    }
+
+    @Test
+    void sortBy_nameAsc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+        expected.add(0, expected.get(9));
+        expected.remove(10);
+        service.sortBy(actual, GiftCertificateSortType.NAME_ASC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_nameDesc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+        expected.add(0, expected.get(9));
+        expected.remove(10);
+        Collections.reverse(expected);
+        service.sortBy(actual, GiftCertificateSortType.NAME_DESC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_createDateAsc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+        service.sortBy(actual, GiftCertificateSortType.CREATE_DATE_ASC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_createDateDesc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+        Collections.reverse(expected);
+        service.sortBy(actual, GiftCertificateSortType.CREATE_DATE_DESC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_NameAndCreateDateAsc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+
+        expected.add(0, expected.get(9));
+        expected.remove(10);
+
+        GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(11);
+        giftCertificate.setName("1certificate");
+        giftCertificate.setDescription("1description");
+        giftCertificate.setPrice(1);
+        giftCertificate.setDuration(1);
+        giftCertificate.setCreateDate(LocalDateTime.now());
+        giftCertificate.setLastUpdateDate(LocalDateTime.now());
+
+        expected.add(2, giftCertificate);
+        actual.add(giftCertificate);
+
+        service.sortBy(actual, GiftCertificateSortType.NAME_CREATE_DATE_ASC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_NameAndCreateDateDesc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+
+        expected.add(0, expected.get(9));
+        expected.remove(10);
+
+        GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(11);
+        giftCertificate.setName("1certificate");
+        giftCertificate.setDescription("1description");
+        giftCertificate.setPrice(1);
+        giftCertificate.setDuration(1);
+        giftCertificate.setCreateDate(LocalDateTime.now());
+        giftCertificate.setLastUpdateDate(LocalDateTime.now());
+
+        expected.add(2, giftCertificate);
+        actual.add(giftCertificate);
+        Collections.reverse(expected);
+        service.sortBy(actual, GiftCertificateSortType.NAME_CREATE_DATE_DESC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_CreateDateAndNameAsc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+
+        GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(11);
+        giftCertificate.setName("1certificate");
+        giftCertificate.setDescription("1description");
+        giftCertificate.setPrice(1);
+        giftCertificate.setDuration(1);
+        giftCertificate.setCreateDate(LocalDateTime.now());
+        giftCertificate.setLastUpdateDate(LocalDateTime.now());
+
+        expected.add(giftCertificate);
+        actual.add(giftCertificate);
+
+        service.sortBy(actual, GiftCertificateSortType.CREATE_DATE_NAME_ASC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void sortBy_CreateDateAndNameDesc_sortedList() {
+        List<GiftCertificate> actual = new LinkedList<>(giftCertificateList);
+        List<GiftCertificate> expected = new LinkedList<>(giftCertificateList);
+
+        GiftCertificate giftCertificate = new GiftCertificate();
+        giftCertificate.setId(11);
+        giftCertificate.setName("1certificate");
+        giftCertificate.setDescription("1description");
+        giftCertificate.setPrice(1);
+        giftCertificate.setDuration(1);
+        giftCertificate.setCreateDate(LocalDateTime.now());
+        giftCertificate.setLastUpdateDate(LocalDateTime.now());
+
+        expected.add(giftCertificate);
+        actual.add(giftCertificate);
+        Collections.reverse(expected);
+        service.sortBy(actual, GiftCertificateSortType.CREATE_DATE_NAME_DESC);
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void findAllByTagName_existentTagName_nonEmptyList() {
+        Mockito.when(service.findAllByTagName(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByTagName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByTagName_nonExistentTagName_emptyList() {
+        Mockito.when(service.findAllByTagName(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByTagName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByTagName_null_emptyList() {
+        Mockito.when(service.findAllByTagName(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByTagName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_existentCertificateName_allCertificatesWithAllTags() {
+        Mockito.when(service.findAllByPartOfCertificateName(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByPartOfCertificateName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_nonExistentCertificateName_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateName(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByPartOfCertificateName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_null_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateName(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service. findAllByPartOfCertificateName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_existentCertificateDescription_allCertificatesWithAllTags() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByPartOfCertificateDescription(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_nonExistentCertificateDescription_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByPartOfCertificateDescription(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_null_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service. findAllByPartOfCertificateDescription(null).isEmpty());
     }
 }
