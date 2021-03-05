@@ -185,7 +185,7 @@ public class DataAccessConfiguration {
                                                                   ResultSetExtractor<GiftCertificate> resultSetExtractor,
                                                                   GiftTagRepository giftTagRepository,
                                                                   ResultSetExtractor<List<GiftCertificate>> listExtractor) {
-        return new GiftCertificateRepositoryImpl(dataSource, resultSetExtractor, giftTagRepository, certificateRowMapperWithCheck, listExtractor);
+        return new GiftCertificateRepositoryImpl(dataSource, resultSetExtractor, giftTagRepository, listExtractor);
     }
 
     @Bean
