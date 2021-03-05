@@ -222,14 +222,14 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public List<GiftCertificate> findAllByPartOfCertificateName(String part) {
         return namedParameterJdbcTemplate.query(QUERY_FIND_ALL_LIKE_CERTIFICATE_NAME,
-                new MapSqlParameterSource().addValue("part", "'%" + part + "'%"),
+                new MapSqlParameterSource().addValue("part", "%" + part + "%"),
                 listExtractor);
     }
 
     @Override
     public List<GiftCertificate> findAllByPartOfCertificateDescription(String part) {
         return namedParameterJdbcTemplate.query(QUERY_FIND_ALL_LIKE_CERTIFICATE_DESCRIPTION,
-                new MapSqlParameterSource().addValue("part", "'%" + part + "'%"),
+                new MapSqlParameterSource().addValue("part", "%" + part + "%"),
                 listExtractor);
     }
 }
