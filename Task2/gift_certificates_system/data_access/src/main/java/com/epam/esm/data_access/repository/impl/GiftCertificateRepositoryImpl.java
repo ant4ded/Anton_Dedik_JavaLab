@@ -5,7 +5,10 @@ import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import com.epam.esm.data_access.repository.GiftTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,40 +18,42 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
 import java.util.HashSet;
+import java.util.List;
 
 @Repository
 public class GiftCertificateRepositoryImpl implements GiftCertificateRepository {
     private static final String QUERY_FIND_BY_ID = "SELECT " +
-            "gc.id," +
-            "gc.name," +
-            "gc.description," +
-            "gc.price," +
-            "gc.duration," +
-            "gc.create_date," +
-            "gc.last_update_date, " +
-            "t.id , " +
-            "t.name " +
+            "gc.id                  AS gift_certificate_id, " +
+            "gc.name                AS gift_certificate_name," +
+            "gc.description         AS gift_certificate_description," +
+            "gc.price               AS gift_certificate_price," +
+            "gc.duration            AS gift_certificate_duration," +
+            "gc.create_date         AS gift_certificate_create_date," +
+            "gc.last_update_date    AS gift_certificate_last_update_date, " +
+            "t.id                   AS tag_id, " +
+            "t.name                 AS tag_name " +
             "FROM public.gift_certificate AS gc " +
             "INNER JOIN public.gift_certificate_tag AS gct " +
             "   ON gct.id_gift_certificate = gc.id " +
-            "INNER JOIN public.tag AS t " +
+            "INNER JOIN public.tag                  AS t " +
             "   ON t.id = gct.id_tag " +
             "WHERE gc.id = :id";
     private static final String QUERY_FIND_BY_NAME = "SELECT " +
-            "gc.id," +
-            "gc.name," +
-            "gc.description," +
-            "gc.price," +
-            "gc.duration," +
-            "gc.create_date," +
-            "gc.last_update_date, " +
-            "t.id , " +
-            "t.name " +
+            "gc.id                  AS gift_certificate_id, " +
+            "gc.name                AS gift_certificate_name," +
+            "gc.description         AS gift_certificate_description," +
+            "gc.price               AS gift_certificate_price," +
+            "gc.duration            AS gift_certificate_duration," +
+            "gc.create_date         AS gift_certificate_create_date," +
+            "gc.last_update_date    AS gift_certificate_last_update_date, " +
+            "t.id                   AS tag_id, " +
+            "t.name                 AS tag_name " +
             "FROM public.gift_certificate AS gc " +
             "INNER JOIN public.gift_certificate_tag AS gct " +
             "   ON gct.id_gift_certificate = gc.id " +
-            "INNER JOIN public.tag AS t " +
+            "INNER JOIN public.tag                  AS t " +
             "   ON t.id = gct.id_tag " +
             "WHERE gc.name = :name";
     private static final String QUERY_SAVE = "INSERT INTO public.gift_certificate (" +
@@ -74,31 +79,89 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "WHERE id_gift_certificate = :id; " +
             "DELETE FROM public.gift_certificate " +
             "WHERE id = :id";
+    private static final String QUERY_FIND_ALL_BY_TAG_NAME = "SELECT  DISTINCT " +
+            "gc.id                      AS gift_certificate_id, " +
+            "gc.name                    AS gift_certificate_name," +
+            "gc.description             AS gift_certificate_description," +
+            "gc.price                   AS gift_certificate_price," +
+            "gc.duration                AS gift_certificate_duration," +
+            "gc.create_date             AS gift_certificate_create_date," +
+            "gc.last_update_date        AS gift_certificate_last_update_date, " +
+            "t_all.id                   AS tag_id, " +
+            "t_all.name                 AS tag_name " +
+            "FROM public.tag AS t " +
+            "INNER JOIN public.gift_certificate_tag AS gct " +
+            "   ON gct.id_tag = t.id " +
+            "       AND t.name = :name " +
+            "INNER JOIN public.gift_certificate     AS gc " +
+            "   ON gc.id = gct.id_gift_certificate " +
+            "INNER JOIN public.gift_certificate_tag AS gct_all " +
+            "   ON gct_all.id_gift_certificate = gc.id " +
+            "INNER JOIN public.tag AS t_all " +
+            "   ON t_all.id = gct_all.id_tag" ;
+    private static final String QUERY_FIND_ALL_LIKE_CERTIFICATE_NAME = "SELECT " +
+            "gc.id                  AS gift_certificate_id, " +
+            "gc.name                AS gift_certificate_name," +
+            "gc.description         AS gift_certificate_description," +
+            "gc.price               AS gift_certificate_price," +
+            "gc.duration            AS gift_certificate_duration," +
+            "gc.create_date         AS gift_certificate_create_date," +
+            "gc.last_update_date    AS gift_certificate_last_update_date, " +
+            "t.id                   AS tag_id, " +
+            "t.name                 AS tag_name " +
+            "FROM public.gift_certificate AS gc " +
+            "INNER JOIN public.gift_certificate_tag AS gct " +
+            "   ON gct.id_gift_certificate = gc.id " +
+            "INNER JOIN public.tag                  AS t " +
+            "   ON t.id = gct.id_tag " +
+            "WHERE gc.name LIKE :part";
+    private static final String QUERY_FIND_ALL_LIKE_CERTIFICATE_DESCRIPTION = "SELECT " +
+            "gc.id                  AS gift_certificate_id, " +
+            "gc.name                AS gift_certificate_name," +
+            "gc.description         AS gift_certificate_description," +
+            "gc.price               AS gift_certificate_price," +
+            "gc.duration            AS gift_certificate_duration," +
+            "gc.create_date         AS gift_certificate_create_date," +
+            "gc.last_update_date    AS gift_certificate_last_update_date, " +
+            "t.id                   AS tag_id, " +
+            "t.name                 AS tag_name " +
+            "FROM public.gift_certificate AS gc " +
+            "INNER JOIN public.gift_certificate_tag AS gct " +
+            "   ON gct.id_gift_certificate = gc.id " +
+            "INNER JOIN public.tag                  AS t " +
+            "   ON t.id = gct.id_tag " +
+            "WHERE gc.description LIKE :part";
 
 
     private final ResultSetExtractor<GiftCertificate> certificateExtractor;
-    private final NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
     private final GiftTagRepository tagRepository;
+    private final RowMapper<GiftCertificate> rowMapper;
+    private final ResultSetExtractor<List<GiftCertificate>> listExtractor;
 
     @Autowired
     public GiftCertificateRepositoryImpl(DataSource dataSource,
                                          ResultSetExtractor<GiftCertificate> certificateExtractor,
-                                         GiftTagRepository tagRepository) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+                                         GiftTagRepository tagRepository,
+                                         @Qualifier("giftCertificateRowMapperWithCheck") RowMapper<GiftCertificate> rowMapper,
+                                         ResultSetExtractor<List<GiftCertificate>> listExtractor) {
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         this.certificateExtractor = certificateExtractor;
         this.tagRepository = tagRepository;
+        this.rowMapper = rowMapper;
+        this.listExtractor = listExtractor;
     }
 
     @Override
     public GiftCertificate findById(long id) {
-        return jdbcTemplate.query(QUERY_FIND_BY_ID,
+        return namedParameterJdbcTemplate.query(QUERY_FIND_BY_ID,
                 new MapSqlParameterSource().addValue("id", id),
                 certificateExtractor);
     }
 
     @Override
     public GiftCertificate findByName(String name) {
-        return jdbcTemplate.query(QUERY_FIND_BY_NAME,
+        return namedParameterJdbcTemplate.query(QUERY_FIND_BY_NAME,
                 new MapSqlParameterSource().addValue("name", name),
                 certificateExtractor);
     }
@@ -108,11 +171,11 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
     @Override
     public long save(GiftCertificate giftCertificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftCertificate), keyHolder);
+        namedParameterJdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftCertificate), keyHolder);
         giftCertificate.setId(keyHolder.getKeyAs(Long.class));
         for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
             saveNonExistTag(giftTag);
-            jdbcTemplate.update(QUERY_SAVE_FOREIGN_KEY, new MapSqlParameterSource()
+            namedParameterJdbcTemplate.update(QUERY_SAVE_FOREIGN_KEY, new MapSqlParameterSource()
                     .addValue("id_gift_certificate", giftCertificate.getId())
                     .addValue("id_tag", giftTag.getId()));
         }
@@ -131,13 +194,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
             saveNonExistTag(giftTag);
         }
-        return jdbcTemplate.update(QUERY_UPDATE, new BeanPropertySqlParameterSource(giftCertificate)) > 0;
+        return namedParameterJdbcTemplate.update(QUERY_UPDATE, new BeanPropertySqlParameterSource(giftCertificate)) > 0;
     }
 
     @Transactional
     @Override
     public boolean deleteById(long id) {
-        return jdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
+        return namedParameterJdbcTemplate.update(QUERY_DELETE, new MapSqlParameterSource().addValue("id", id)) > 0;
     }
 
     private void saveNonExistTag(GiftTag giftTag) {
@@ -147,5 +210,26 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         } else {
             giftTag.setId(giftTagFromDb.getId());
         }
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByTagName(String name) {
+        return namedParameterJdbcTemplate.query(QUERY_FIND_ALL_BY_TAG_NAME,
+                new MapSqlParameterSource().addValue("name", name),
+                listExtractor);
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByPartOfCertificateName(String part) {
+        return namedParameterJdbcTemplate.query(QUERY_FIND_ALL_LIKE_CERTIFICATE_NAME,
+                new MapSqlParameterSource().addValue("part", "%" + part + "%"),
+                listExtractor);
+    }
+
+    @Override
+    public List<GiftCertificate> findAllByPartOfCertificateDescription(String part) {
+        return namedParameterJdbcTemplate.query(QUERY_FIND_ALL_LIKE_CERTIFICATE_DESCRIPTION,
+                new MapSqlParameterSource().addValue("part", "%" + part + "%"),
+                listExtractor);
     }
 }

@@ -7,11 +7,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.com.epam.esm.data_access.conf.DataAccessConfiguration;
 
+import java.util.List;
+
 @ExtendWith(SpringExtension.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @ContextConfiguration(classes = DataAccessConfiguration.class)
 class GiftCertificateRepositoryImplTest {
     @Autowired
@@ -36,7 +40,8 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void findByName_existentName_giftCertificateWithAllTags() {
         GiftCertificate giftCertificate = repository.findByName("3certificate");
-        Assertions.assertTrue(giftCertificate != null && giftCertificate.getTagList().size() == 3);
+        System.out.println(giftCertificate.toString());
+        Assertions.assertEquals(3, giftCertificate.getTagList().size());
     }
 
     @Test
@@ -113,5 +118,61 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void deleteById_nonExistentId_false() {
         Assertions.assertFalse(repository.deleteById(-1));
+    }
+
+    @Test
+    void findAllByTagName_existentTagName_allCertificatesWithAllTags() {
+        int firstTagsCount;
+        int secondTagsCount;
+        List<GiftCertificate> list = repository.findAllByTagName("2tag");
+        firstTagsCount = list.get(0).getTagList().size();
+        secondTagsCount = list.get(1).getTagList().size();
+        Assertions.assertTrue(firstTagsCount == 2 && secondTagsCount == 3);
+    }
+
+    @Test
+    void findAllByTagName_nonExistentTagName_emptyList() {
+        Assertions.assertTrue(repository.findAllByTagName("999").isEmpty());
+    }
+
+    @Test
+    void findAllByTagName_null_emptyList() {
+        Assertions.assertTrue(repository.findAllByTagName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_existentCertificateName_allCertificatesWithAllTags() {
+        int tagsCount;
+        List<GiftCertificate> list = repository.findAllByPartOfCertificateName("3");
+        tagsCount = list.get(0).getTagList().size();
+        Assertions.assertEquals(3, tagsCount);
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_nonExistentCertificateName_emptyList() {
+        Assertions.assertTrue(repository.findAllByPartOfCertificateName("999").isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_null_emptyList() {
+        Assertions.assertTrue(repository.findAllByPartOfCertificateName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_existentCertificateDescription_allCertificatesWithAllTags() {
+        int tagsCount;
+        List<GiftCertificate> list = repository.findAllByPartOfCertificateDescription("3");
+        tagsCount = list.get(0).getTagList().size();
+        Assertions.assertEquals(3, tagsCount);
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_nonExistentCertificateDescription_emptyList() {
+        Assertions.assertTrue(repository.findAllByPartOfCertificateDescription("999").isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_null_emptyList() {
+        Assertions.assertTrue(repository.findAllByPartOfCertificateDescription(null).isEmpty());
     }
 }
