@@ -193,6 +193,19 @@ class EntityValidatorServiceImplTest {
     }
 
     @Test
+    void validateCertificate_invalidTag_exception(@Autowired GiftCertificate giftCertificate) {
+        giftCertificate.setDuration(0);
+        for (GiftTag giftTag : giftCertificate.getTagList()) {
+            giftTag.setName(null);
+        }
+        Exception exception = Assertions.assertThrows(Exception.class,
+                () -> service.validateCertificate(giftCertificate));
+        exception.printStackTrace();
+        Assertions.assertTrue(exception.getMessage().contains("Certificate")
+                && exception.getMessage().contains("Tag"));
+    }
+
+    @Test
     void validateTag_correctEntity_exceptionDoesNotThrow(@Autowired GiftTag giftTag) {
         Assertions.assertDoesNotThrow(() -> service.validateTag(giftTag));
     }
