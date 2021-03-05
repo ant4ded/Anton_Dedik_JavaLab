@@ -11,6 +11,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import test.com.epam.esm.data_access.conf.DataAccessConfiguration;
 
+import java.util.List;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = DataAccessConfiguration.class)
 class GiftCertificateRepositoryImplTest {
@@ -36,7 +38,8 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void findByName_existentName_giftCertificateWithAllTags() {
         GiftCertificate giftCertificate = repository.findByName("3certificate");
-        Assertions.assertTrue(giftCertificate != null && giftCertificate.getTagList().size() == 3);
+        System.out.println(giftCertificate.toString());
+        Assertions.assertEquals(3, giftCertificate.getTagList().size());
     }
 
     @Test
@@ -113,5 +116,15 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void deleteById_nonExistentId_false() {
         Assertions.assertFalse(repository.deleteById(-1));
+    }
+
+    @Test
+    void findAllByTagName_existentTagName_allCertificatesWithAllTags() {
+        int firstTagsCount;
+        int secondTagsCount;
+        List<GiftCertificate> list = repository.findAllByTagName("2tag");
+        firstTagsCount = list.get(0).getTagList().size();
+        secondTagsCount = list.get(1).getTagList().size();
+        Assertions.assertTrue(firstTagsCount == 2 && secondTagsCount == 3);
     }
 }
