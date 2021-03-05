@@ -42,7 +42,7 @@ public class EntityValidatorServiceImpl implements EntityValidatorService {
         boolean isValidName = giftTag.getName() != null && !giftTag.getName().equals("");
         if (!isValidName) {
             StringBuilder stringBuilder = new StringBuilder("Invalid entity fields ");
-            stringBuilder.append("of ").append(GiftCertificate.class.getSimpleName()).append(": name.");
+            stringBuilder.append("of ").append(GiftTag.class.getSimpleName()).append(": name.");
             throw new InvalidEntityFieldException(stringBuilder.toString());
         }
     }
