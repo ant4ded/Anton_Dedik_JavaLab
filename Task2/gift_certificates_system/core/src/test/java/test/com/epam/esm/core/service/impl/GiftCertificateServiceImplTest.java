@@ -245,4 +245,58 @@ class GiftCertificateServiceImplTest {
         service.sortBy(actual, GiftCertificateSortType.CREATE_DATE_NAME_DESC);
         Assertions.assertEquals(expected, actual);
     }
+
+    @Test
+    void findAllByTagName_existentTagName_nonEmptyList() {
+        Mockito.when(service.findAllByTagName(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByTagName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByTagName_nonExistentTagName_emptyList() {
+        Mockito.when(service.findAllByTagName(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByTagName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByTagName_null_emptyList() {
+        Mockito.when(service.findAllByTagName(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByTagName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_existentCertificateName_allCertificatesWithAllTags() {
+        Mockito.when(service.findAllByPartOfCertificateName(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByPartOfCertificateName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_nonExistentCertificateName_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateName(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByPartOfCertificateName(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateName_null_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateName(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service. findAllByPartOfCertificateName(null).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_existentCertificateDescription_allCertificatesWithAllTags() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(Mockito.anyString())).thenReturn(giftCertificateList);
+        Assertions.assertFalse(service.findAllByPartOfCertificateDescription(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_nonExistentCertificateDescription_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(Mockito.anyString())).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service.findAllByPartOfCertificateDescription(Mockito.anyString()).isEmpty());
+    }
+
+    @Test
+    void findAllByPartOfCertificateDescription_null_emptyList() {
+        Mockito.when(service.findAllByPartOfCertificateDescription(null)).thenReturn(new LinkedList<>());
+        Assertions.assertTrue(service. findAllByPartOfCertificateDescription(null).isEmpty());
+    }
 }
