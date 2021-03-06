@@ -24,16 +24,20 @@ import java.util.List;
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm.data_access")
 public class DataAccessConfiguration {
+    @Autowired
+    @Qualifier("giftTagRowMapper")
     private RowMapper<GiftTag> tagRowMapper;
+    @Autowired
+    @Qualifier("giftCertificateRowMapperWithCheck")
     private RowMapper<GiftCertificate> certificateRowMapperWithCheck;
 
-    @Autowired
-    @PostConstruct
-    private void init(@Qualifier("giftTagRowMapper") RowMapper<GiftTag> tagRowMapper,
-                      @Qualifier("giftCertificateRowMapperWithCheck") RowMapper<GiftCertificate> certificateRowMapperWithCheck) {
-        this.tagRowMapper = tagRowMapper;
-        this.certificateRowMapperWithCheck = certificateRowMapperWithCheck;
-    }
+//    @Autowired
+//    @PostConstruct
+//    private void init(@Qualifier("giftTagRowMapper") RowMapper<GiftTag> tagRowMapper,
+//                      @Qualifier("giftCertificateRowMapperWithCheck") RowMapper<GiftCertificate> certificateRowMapperWithCheck) {
+//        this.tagRowMapper = tagRowMapper;
+//        this.certificateRowMapperWithCheck = certificateRowMapperWithCheck;
+//    }
 
     private GiftCertificate getGiftCertificate(ResultSet rs) throws SQLException {
         GiftCertificate certificate = new GiftCertificate();
@@ -63,7 +67,7 @@ public class DataAccessConfiguration {
 
     @Bean
     protected DataSource dataSource() {
-        return new HikariDataSource(new HikariConfig("classpath:db.properties"));
+        return new HikariDataSource(new HikariConfig("/db.properties"));
     }
 
     @Bean
