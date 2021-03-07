@@ -188,8 +188,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         GiftCertificate certificateFromDb = findByName(giftCertificate.getName());
         if (certificateFromDb == null) {
             return false;
-        } else {
-            giftCertificate.setId(certificateFromDb.getId());
         }
         for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
             saveNonExistTag(giftTag);
