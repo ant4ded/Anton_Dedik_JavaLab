@@ -58,12 +58,12 @@ public class GiftTagRepositoryImpl implements GiftTagRepository {
                 tagExtractor);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public long save(GiftTag giftTag) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftTag), keyHolder);
-        return keyHolder.getKeyAs(Long.class);
+        jdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftTag), keyHolder,
+                new String[]{TagTableColumnName.COLUMN_ID});
+        return keyHolder.getKey().longValue();
     }
 
     @Transactional

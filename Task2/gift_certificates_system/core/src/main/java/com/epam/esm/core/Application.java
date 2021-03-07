@@ -1,18 +1,23 @@
 package com.epam.esm.core;
 
-import com.epam.esm.data_access.conf.DataAccessConfiguration;
-import com.epam.esm.core.conf.ServiceConfiguration;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
+import com.epam.esm.core.conf.WebConfiguration;
+import org.springframework.web.WebApplicationInitializer;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
 
-@ComponentScan
-public class Application {
-    public static void main(String[] args) {
-        ApplicationContext context = new AnnotationConfigApplicationContext(ServiceConfiguration.class,
-                DataAccessConfiguration.class);
-        for (String beanName : context.getBeanDefinitionNames()) {
-            System.out.println(beanName);
-        }
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
+
+@SuppressWarnings("NullableProblems")
+public class Application implements WebApplicationInitializer {
+    @Override
+    public void onStartup(ServletContext servletContext) {
+        AnnotationConfigWebApplicationContext webCtx = new AnnotationConfigWebApplicationContext();
+        webCtx.register(WebConfiguration.class);
+        webCtx.setServletContext(servletContext);
+        ServletRegistration.Dynamic servlet = servletContext.addServlet("dispatcher", new DispatcherServlet(webCtx));
+        servlet.setLoadOnStartup(1);
+        servlet.addMapping("/");
+        servlet.setAsyncSupported(true);
     }
 }

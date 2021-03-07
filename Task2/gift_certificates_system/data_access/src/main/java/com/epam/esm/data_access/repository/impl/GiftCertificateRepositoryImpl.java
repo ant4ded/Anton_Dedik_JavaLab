@@ -50,9 +50,9 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
             "t.id                   AS tag_id, " +
             "t.name                 AS tag_name " +
             "FROM public.gift_certificate AS gc " +
-            "INNER JOIN public.gift_certificate_tag AS gct " +
+            "LEFT JOIN public.gift_certificate_tag AS gct " +
             "   ON gct.id_gift_certificate = gc.id " +
-            "INNER JOIN public.tag                  AS t " +
+            "LEFT JOIN public.tag                  AS t " +
             "   ON t.id = gct.id_tag " +
             "WHERE gc.name = :name";
     private static final String QUERY_SAVE = "INSERT INTO public.gift_certificate (" +
@@ -162,13 +162,13 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
                 certificateExtractor);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Transactional
     @Override
     public long save(GiftCertificate giftCertificate) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        namedParameterJdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftCertificate), keyHolder);
-        giftCertificate.setId(keyHolder.getKeyAs(Long.class));
+        namedParameterJdbcTemplate.update(QUERY_SAVE, new BeanPropertySqlParameterSource(giftCertificate), keyHolder,
+                new String[]{GiftCertificateTableColumnName.COLUMN_ID});
+        giftCertificate.setId(keyHolder.getKey().longValue());
         for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
             saveNonExistTag(giftTag);
             namedParameterJdbcTemplate.update(QUERY_SAVE_FOREIGN_KEY, new MapSqlParameterSource()
@@ -188,8 +188,6 @@ public class GiftCertificateRepositoryImpl implements GiftCertificateRepository 
         GiftCertificate certificateFromDb = findByName(giftCertificate.getName());
         if (certificateFromDb == null) {
             return false;
-        } else {
-            giftCertificate.setId(certificateFromDb.getId());
         }
         for (GiftTag giftTag : new HashSet<>(giftCertificate.getTagList())) {
             saveNonExistTag(giftTag);

@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface GiftCertificateService {
     Optional<GiftCertificate> findByName(String name);
 
-    boolean save(GiftCertificate giftCertificate) throws InvalidEntityFieldException;
+    GiftCertificate save(GiftCertificate giftCertificate) throws InvalidEntityFieldException, DuplicateEntityException, ServiceException;
 
-    boolean update(GiftCertificate giftCertificate);
+    GiftCertificate update(GiftCertificate giftCertificate) throws ServiceException;
 
-    boolean delete(GiftCertificate giftCertificate);
+    boolean delete(String name);
 
     List<GiftCertificate> findAllByTagName(String name);
 
