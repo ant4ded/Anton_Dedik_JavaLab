@@ -62,6 +62,12 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
+    void save_existEntity_exception(@Autowired GiftCertificate giftCertificate) {
+        Mockito.when(repository.findByName(giftCertificate.getName())).thenReturn(giftCertificate);
+        Assertions.assertThrows(DuplicateEntityException.class, () -> service.save(giftCertificate));
+    }
+
+    @Test
     void save_incorrectEntity_exception(@Autowired GiftCertificate giftCertificate) throws InvalidEntityFieldException {
         Mockito.doThrow(InvalidEntityFieldException.class).when(validator).validateCertificate(giftCertificate);
         Assertions.assertThrows(InvalidEntityFieldException.class, () -> service.save(giftCertificate));
