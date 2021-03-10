@@ -63,7 +63,7 @@ public class GiftCertificateController {
                 .getAllByTagName(name)).withSelfRel());
     }
 
-    @PostMapping
+    @PostMapping(value = "/new", consumes = "application/json", produces = "application/json")
     public ResponseEntity<EntityModel<GiftCertificate>> create(@RequestBody GiftCertificate certificate)
             throws InvalidEntityFieldException, DuplicateEntityException, ServiceException {
         EntityModel<GiftCertificate> model = assembler.toModel(service.save(certificate));
