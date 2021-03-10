@@ -1,9 +1,7 @@
 package com.epam.esm.core.service.impl;
 
-import com.epam.esm.core.service.EntityValidatorService;
-import com.epam.esm.core.service.GiftCertificateService;
-import com.epam.esm.core.service.GiftCertificateSortType;
-import com.epam.esm.core.service.InvalidEntityFieldException;
+import com.epam.esm.core.controller.advice.util.ExceptionMessagePropertyKey;
+import com.epam.esm.core.service.*;
 import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import java.util.Optional;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final String SPACE = " ";
     private final GiftCertificateRepository repository;
     private final EntityValidatorService validatorService;
 
@@ -31,31 +30,41 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    public boolean save(GiftCertificate giftCertificate) throws InvalidEntityFieldException {
+    public GiftCertificate save(GiftCertificate giftCertificate) throws InvalidEntityFieldException,
+            DuplicateEntityException, ServiceException {
         if (giftCertificate == null) {
-            return false;
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_ENTITY_NULL);
+        }
+        if (repository.findByName(giftCertificate.getName()) != null) {
+            throw new DuplicateEntityException(ExceptionMessagePropertyKey.DUPLICATE_ENTITY_NAME + SPACE +
+                    giftCertificate.getName() + SPACE + ExceptionMessagePropertyKey.DUPLICATE_ENTITY_EXISTS);
         }
         validatorService.validateCertificate(giftCertificate);
         giftCertificate.setCreateDate(LocalDateTime.now());
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        return repository.save(giftCertificate) > 0;
+        if (repository.save(giftCertificate) < 0) {
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_SOMETHING_WRONG);
+        }
+        giftCertificate.setId(0);
+        return giftCertificate;
     }
 
     @Override
-    public boolean update(GiftCertificate giftCertificate) {
+    public GiftCertificate update(GiftCertificate giftCertificate) throws ServiceException {
         if (giftCertificate == null) {
-            return false;
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_ENTITY_NULL);
         }
+        giftCertificate.setCreateDate(null);
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        return repository.updateByName(giftCertificate);
+        repository.updateByName(giftCertificate);
+        return findByName(giftCertificate.getName()).orElseThrow(() ->
+                new ServiceException(ExceptionMessagePropertyKey.SERVICE_NOTHING_BY_NAME + SPACE +
+                        giftCertificate.getName()));
     }
 
     @Override
-    public boolean delete(GiftCertificate giftCertificate) {
-        if (giftCertificate == null) {
-            return false;
-        }
-        return repository.deleteById(findByName(giftCertificate.getName()).orElse(new GiftCertificate()).getId());
+    public boolean delete(String name) {
+        return repository.deleteById(findByName(name).orElse(new GiftCertificate()).getId());
     }
 
     @Override
@@ -105,7 +114,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 comparator = Comparator.comparing(GiftCertificate::getCreateDate).thenComparing(GiftCertificate::getName);
                 break;
             }
-            case CREATE_DATE_NAME_DESC:{
+            case CREATE_DATE_NAME_DESC: {
                 comparator = Comparator.comparing(GiftCertificate::getCreateDate).thenComparing(GiftCertificate::getName).reversed();
                 break;
             }

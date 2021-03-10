@@ -6,6 +6,7 @@ import com.epam.esm.data_access.entity.table.GiftCertificateTableColumnName;
 import com.epam.esm.data_access.entity.table.TagTableColumnName;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.postgresql.util.PSQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,16 +24,9 @@ import java.util.List;
 @Configuration
 @ComponentScan(basePackages = "com.epam.esm.data_access")
 public class DataAccessConfiguration {
-    private RowMapper<GiftTag> tagRowMapper;
-    private RowMapper<GiftCertificate> certificateRowMapperWithCheck;
-
     @Autowired
-    @PostConstruct
-    private void init(@Qualifier("giftTagRowMapper") RowMapper<GiftTag> tagRowMapper,
-                      @Qualifier("giftCertificateRowMapperWithCheck") RowMapper<GiftCertificate> certificateRowMapperWithCheck) {
-        this.tagRowMapper = tagRowMapper;
-        this.certificateRowMapperWithCheck = certificateRowMapperWithCheck;
-    }
+    @Qualifier("giftTagRowMapper")
+    private RowMapper<GiftTag> tagRowMapper;
 
     private GiftCertificate getGiftCertificate(ResultSet rs) throws SQLException {
         GiftCertificate certificate = new GiftCertificate();
@@ -63,7 +56,7 @@ public class DataAccessConfiguration {
 
     @Bean
     protected DataSource dataSource() {
-        return new HikariDataSource(new HikariConfig("classpath:db.properties"));
+        return new HikariDataSource(new HikariConfig("/db.properties"));
     }
 
     @Bean
@@ -90,14 +83,23 @@ public class DataAccessConfiguration {
     }
 
     @Bean
-    protected ResultSetExtractor<GiftCertificate> giftCertificateResultSetExtractor() {
+    @Autowired
+    protected ResultSetExtractor<GiftCertificate> giftCertificateResultSetExtractor(
+            @Qualifier("giftCertificateRowMapperWithCheck")
+                    RowMapper<GiftCertificate> certificateRowMapperWithCheck) {
         return rs -> {
             int rowNum = 0;
             GiftCertificate certificate = certificateRowMapperWithCheck.mapRow(rs, rowNum);
             if (certificate != null) {
-                do {
-                    certificate.addTag(tagRowMapper.mapRow(rs, rowNum));
-                } while (rs.next());
+                while (rs.isBeforeFirst() || !rs.isAfterLast()) {
+                    try {
+                        certificate.addTag(tagRowMapper.mapRow(rs, rowNum));
+                        rs.next();
+                    } catch (PSQLException e) {
+                        //throw exception when data exists for some unknown reason (only on real db)
+                        rs.next();
+                    }
+                }
             }
             return certificate;
         };
@@ -105,7 +107,8 @@ public class DataAccessConfiguration {
 
     @Bean
     @Autowired
-    protected ResultSetExtractor<GiftTag> giftTagResultSetExtractor(@Qualifier("giftTagRowMapperWithCheck") RowMapper<GiftTag> tagRowMapperWithCheck) {
+    protected ResultSetExtractor<GiftTag> giftTagResultSetExtractor(
+            @Qualifier("giftTagRowMapperWithCheck") RowMapper<GiftTag> tagRowMapperWithCheck) {
         return rs -> tagRowMapperWithCheck.mapRow(rs, 0);
     }
 
