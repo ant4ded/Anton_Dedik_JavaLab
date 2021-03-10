@@ -40,7 +40,6 @@ class GiftCertificateRepositoryImplTest {
     @Test
     void findByName_existentName_giftCertificateWithAllTags() {
         GiftCertificate giftCertificate = repository.findByName("3certificate");
-        System.out.println(giftCertificate.toString());
         Assertions.assertEquals(3, giftCertificate.getTagList().size());
     }
 
