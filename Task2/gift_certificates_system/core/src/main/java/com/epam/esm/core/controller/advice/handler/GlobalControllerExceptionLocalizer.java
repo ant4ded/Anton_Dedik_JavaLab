@@ -40,7 +40,6 @@ public class GlobalControllerExceptionLocalizer {
 
         ModelAndView model = new ModelAndView();
         model.addObject("msg", message);
-//        model.addObject("url", req.getRequestURL());
         model.setViewName(DEFAULT_ERROR_VIEW);
         return model;
     }
@@ -55,7 +54,6 @@ public class GlobalControllerExceptionLocalizer {
 
         ModelAndView model = new ModelAndView();
         model.addObject("msg", message);
-//        model.addObject("url", req.getRequestURL());
         model.setViewName(DEFAULT_ERROR_VIEW);
         return model;
     }
@@ -74,7 +72,6 @@ public class GlobalControllerExceptionLocalizer {
 
         ModelAndView model = new ModelAndView();
         model.addObject("msg", message);
-//        model.addObject("url", req.getRequestURL());
         model.setViewName(DEFAULT_ERROR_VIEW);
         return model;
     }
