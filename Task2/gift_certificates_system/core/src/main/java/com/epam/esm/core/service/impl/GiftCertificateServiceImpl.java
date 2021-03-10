@@ -1,5 +1,6 @@
 package com.epam.esm.core.service.impl;
 
+import com.epam.esm.core.controller.advice.util.ExceptionMessagePropertyKey;
 import com.epam.esm.core.service.*;
 import com.epam.esm.data_access.entity.GiftCertificate;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
+    private static final String SPACE = " ";
     private final GiftCertificateRepository repository;
     private final EntityValidatorService validatorService;
 
@@ -31,16 +33,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public GiftCertificate save(GiftCertificate giftCertificate) throws InvalidEntityFieldException,
             DuplicateEntityException, ServiceException {
         if (giftCertificate == null) {
-            throw new ServiceException("Received entity was null.");
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_ENTITY_NULL);
         }
         if (repository.findByName(giftCertificate.getName()) != null) {
-            throw new DuplicateEntityException("Entity with name: " + giftCertificate.getName() + " already exists.");
+            throw new DuplicateEntityException(ExceptionMessagePropertyKey.DUPLICATE_ENTITY_NAME + SPACE +
+                    giftCertificate.getName() + SPACE + ExceptionMessagePropertyKey.DUPLICATE_ENTITY_EXISTS);
         }
         validatorService.validateCertificate(giftCertificate);
         giftCertificate.setCreateDate(LocalDateTime.now());
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
         if (repository.save(giftCertificate) < 0) {
-            throw new ServiceException("Something wrong with saving certificate.");
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_SOMETHING_WRONG);
         }
         giftCertificate.setId(0);
         return giftCertificate;
@@ -49,12 +52,14 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Override
     public GiftCertificate update(GiftCertificate giftCertificate) throws ServiceException {
         if (giftCertificate == null) {
-            throw new ServiceException("Received entity was null.");
+            throw new ServiceException(ExceptionMessagePropertyKey.SERVICE_ENTITY_NULL);
         }
         giftCertificate.setCreateDate(null);
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
         repository.updateByName(giftCertificate);
-        return findByName(giftCertificate.getName()).orElseThrow(() -> new ServiceException("Nothing by this name."));
+        return findByName(giftCertificate.getName()).orElseThrow(() ->
+                new ServiceException(ExceptionMessagePropertyKey.SERVICE_NOTHING_BY_NAME + SPACE +
+                        giftCertificate.getName()));
     }
 
     @Override

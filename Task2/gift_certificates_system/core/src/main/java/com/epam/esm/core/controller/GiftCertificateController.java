@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,13 +30,6 @@ public class GiftCertificateController {
     public GiftCertificateController(GiftCertificateService service, GiftCertificateModelAssembler assembler) {
         this.service = service;
         this.assembler = assembler;
-    }
-
-    @GetMapping(value = "/hello")
-    public ResponseEntity<String> sayHello() {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<String>("{\"msg\": \"Hello World\"}", httpHeaders, HttpStatus.OK);
     }
 
     @GetMapping(value = "/{name}")
@@ -73,7 +63,7 @@ public class GiftCertificateController {
                 .getAllByTagName(name)).withSelfRel());
     }
 
-    @PostMapping
+    @PostMapping(value = "/new", consumes = "application/json", produces = "application/json")
     public ResponseEntity<EntityModel<GiftCertificate>> create(@RequestBody GiftCertificate certificate)
             throws InvalidEntityFieldException, DuplicateEntityException, ServiceException {
         EntityModel<GiftCertificate> model = assembler.toModel(service.save(certificate));

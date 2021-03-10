@@ -1,12 +1,8 @@
 package test.com.epam.esm.core.service.impl;
 
-import com.epam.esm.core.service.EntityValidatorService;
-import com.epam.esm.core.service.GiftCertificateService;
-import com.epam.esm.core.service.GiftCertificateSortType;
-import com.epam.esm.core.service.InvalidEntityFieldException;
+import com.epam.esm.core.service.*;
 import com.epam.esm.core.service.impl.GiftCertificateServiceImpl;
 import com.epam.esm.data_access.entity.GiftCertificate;
-import com.epam.esm.data_access.entity.GiftTag;
 import com.epam.esm.data_access.repository.GiftCertificateRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,9 +56,15 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void save_correctEntity_true(@Autowired GiftCertificate giftCertificate) throws InvalidEntityFieldException {
+    void save_correctEntity_true(@Autowired GiftCertificate giftCertificate) {
         Mockito.when(repository.save(giftCertificate)).thenReturn(1L);
-        Assertions.assertTrue(service.save(giftCertificate));
+        Assertions.assertDoesNotThrow(() -> service.save(giftCertificate));
+    }
+
+    @Test
+    void save_existEntity_exception(@Autowired GiftCertificate giftCertificate) {
+        Mockito.when(repository.findByName(giftCertificate.getName())).thenReturn(giftCertificate);
+        Assertions.assertThrows(DuplicateEntityException.class, () -> service.save(giftCertificate));
     }
 
     @Test
@@ -78,32 +80,33 @@ class GiftCertificateServiceImplTest {
     }
 
     @Test
-    void save_null_false() throws InvalidEntityFieldException {
-        Assertions.assertFalse(service.save(null));
+    void save_null_false() {
+        Assertions.assertThrows(ServiceException.class, () -> service.save(null));
     }
 
     @Test
     void update_correctEntity_true(@Autowired GiftCertificate giftCertificate) {
         Mockito.when(repository.updateByName(giftCertificate)).thenReturn(true);
-        Assertions.assertTrue(service.update(giftCertificate));
+        Mockito.when(repository.findByName(giftCertificate.getName())).thenReturn(giftCertificate);
+        Assertions.assertDoesNotThrow(() -> service.update(giftCertificate));
     }
 
     @Test
     void update_null_false() {
-        Assertions.assertFalse(service.update(null));
+        Assertions.assertThrows(ServiceException.class, () -> service.update(null));
     }
 
     @Test
-    void update_nullName_false(@Autowired GiftCertificate giftCertificate) {
+    void update_nullName_exception(@Autowired GiftCertificate giftCertificate) {
         giftCertificate.setName(null);
         Mockito.when(repository.updateByName(giftCertificate)).thenReturn(false);
-        Assertions.assertFalse(service.update(giftCertificate));
+        Assertions.assertThrows(ServiceException.class, () -> service.update(giftCertificate));
     }
 
     @Test
     void delete_existEntity_true(@Autowired GiftCertificate giftCertificate) {
         Mockito.when(repository.findByName(giftCertificate.getName())).thenReturn(giftCertificate);
-        Assertions.assertFalse(service.delete(giftCertificate));
+        Assertions.assertFalse(service.delete(giftCertificate.getName()));
     }
 
     @Test
@@ -115,7 +118,7 @@ class GiftCertificateServiceImplTest {
     void delete_nullName_false(@Autowired GiftCertificate giftCertificate) {
         giftCertificate.setName(null);
         Mockito.when(repository.findByName(null)).thenReturn(null);
-        Assertions.assertFalse(service.delete(giftCertificate));
+        Assertions.assertFalse(service.delete(giftCertificate.getName()));
     }
 
     @Test
@@ -279,7 +282,7 @@ class GiftCertificateServiceImplTest {
     @Test
     void findAllByPartOfCertificateName_null_emptyList() {
         Mockito.when(service.findAllByPartOfCertificateName(null)).thenReturn(new LinkedList<>());
-        Assertions.assertTrue(service. findAllByPartOfCertificateName(null).isEmpty());
+        Assertions.assertTrue(service.findAllByPartOfCertificateName(null).isEmpty());
     }
 
     @Test
@@ -297,6 +300,6 @@ class GiftCertificateServiceImplTest {
     @Test
     void findAllByPartOfCertificateDescription_null_emptyList() {
         Mockito.when(service.findAllByPartOfCertificateDescription(null)).thenReturn(new LinkedList<>());
-        Assertions.assertTrue(service. findAllByPartOfCertificateDescription(null).isEmpty());
+        Assertions.assertTrue(service.findAllByPartOfCertificateDescription(null).isEmpty());
     }
 }
