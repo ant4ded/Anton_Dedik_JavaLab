@@ -1,0 +1,52 @@
+plugins {
+    id 'war'
+}
+
+subprojects {
+    apply plugin: "war"
+
+    tasks.withType(JavaCompile) {
+        group = 'com.epam.esm'
+        version = '0.0.1'
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    buildscript {
+
+        repositories {
+            jcenter()
+        }
+
+        dependencies {
+            classpath 'com.bmuschko:gradle-tomcat-plugin:2.2.2'
+        }
+    }
+
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+    }
+
+    dependencies {
+        implementation group: 'org.springframework',
+                name: 'spring-core',
+                version: project.properties['version.spring']
+        implementation group: 'org.springframework',
+                name: 'spring-context',
+                version: project.properties['version.spring']
+    }
+
+    war {
+        from {
+            configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+        webXml = null
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
