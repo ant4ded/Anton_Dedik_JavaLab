@@ -1,0 +1,25 @@
+apply plugin: 'java'
+
+subprojects {
+    apply plugin: 'java'
+    tasks.withType(JavaCompile) {
+        group = 'com.epam.esm'
+        version = '0.0.1'
+
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        jcenter()
+    }
+    jar {
+        from {
+            configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        }
+    }
+    test {
+        useJUnitPlatform()
+    }
+}
